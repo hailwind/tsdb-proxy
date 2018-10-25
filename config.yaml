@@ -1,0 +1,23 @@
+listenaddr: 0.0.0.0:80
+idletimeout: 10
+backends:
+- name: server1
+  url: http://127.0.0.1:8086
+- name: server2
+  url: http://127.0.0.1:8086
+mappings:
+- name: rate
+  db: telegraf
+  measurement: snmp
+  backends: [server1, server2]
+  metricmap: 
+    {
+      "switch.if.In":"in_rate",
+      "switch.if.Out":"out_rate"
+    }
+  tagmap:
+    {
+      "endpoint":"device_ip",
+      "ifname":"if_name",
+      "ifalias":"if_alias"
+    }
