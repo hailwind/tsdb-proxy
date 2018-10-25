@@ -16,6 +16,11 @@ type Backend struct {
 	URL   string
 	Alive bool
 }
+type Server struct {
+	Scheme  string
+	Host   string
+	Alive bool
+}
 type Mapping struct {
 	Name        string
 	DB          string
@@ -27,8 +32,10 @@ type Mapping struct {
 type Conf struct {
 	ListenAddr  string
 	IdleTimeout int
+	Mode        string
 	Mappings    []Mapping
 	Backends    []Backend
+	RServers    []Server
 }
 
 func (c *Conf) GetInfluxMeta(om string) (im map[string]string, tagmap map[string]string) {

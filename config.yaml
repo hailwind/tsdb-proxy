@@ -1,5 +1,7 @@
 listenaddr: 0.0.0.0:80
 idletimeout: 10
+# reverse, converter
+mode: reverse
 backends:
 - name: server1
   url: http://127.0.0.1:8086
@@ -21,3 +23,9 @@ mappings:
       "ifname":"if_name",
       "ifalias":"if_alias"
     }
+# use by reverse proxy mode
+rservers:
+- scheme: http
+  host: 192.168.1.9:4242
+- scheme: http
+  host: 192.168.1.10:4242
