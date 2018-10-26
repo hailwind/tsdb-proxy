@@ -69,7 +69,7 @@ func (hs *HttpService) HandlerQuery(w http.ResponseWriter, req *http.Request) {
 	// fmt.Println(string(data))
 
 	results := iq.QueryFromBackend(false)
-	if len(results) == 1 {
+	if len(results) == 1 && len(results[0].Series) == 1 {
 		odps := iq.convertResult(&results[0].Series[0])
 		data, _ := json.Marshal(odps)
 		fmt.Fprintln(w, string(data))

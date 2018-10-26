@@ -1,27 +1,144 @@
 listenaddr: 0.0.0.0:80
 idletimeout: 10
 # reverse, converter
-mode: reverse
+mode: converter
 backends:
 - name: server1
   url: http://127.0.0.1:8086
 - name: server2
   url: http://127.0.0.1:8086
 mappings:
-- name: rate
+- name: snmp
   db: telegraf
   measurement: snmp
   backends: [server1, server2]
-  metricmap: 
+  metricmap:
     {
       "switch.if.In":"in_rate",
-      "switch.if.Out":"out_rate"
+      "switch.if.Out":"out_rate",
+      "switch.if.InPkts":"in_pkts_rate",
+      "switch.if.OutPkts":"out_pkts_rate"
     }
   tagmap:
     {
       "endpoint":"device_ip",
-      "ifname":"if_name",
-      "ifalias":"if_alias"
+      "ifname":"if_name"
+    }
+- name: icmp_vsi
+  db: syscxp
+  measurement: icmp_vsi
+  backends: [server1, server2]
+  metricmap: 
+    {
+      "tunnel.packets.lost":"vsi_lost",
+      "tunnel.packets.rtt":"vsi_rtt"
+    }
+  tagmap:
+    {
+      "endpoint":"device_ip",
+      "ifname":"if_name"
+    }
+- name: icmp_vpn
+  db: syscxp
+  measurement: icmp_vpn
+  backends: [server1, server2]
+  metricmap: 
+    {
+      "l3.packets.lost":"vpn_lost",
+      "l3.packets.rtt":"vpn_rtt"
+    }
+  tagmap:
+    {
+      "endpoint":"device_ip",
+      "ifname":"if_name"
+    }
+- name: icmp_ext
+  db: syscxp
+  measurement: icmp_ext
+  backends: [server1, server2]
+  metricmap: 
+    {
+      "endpoint.packets.lost":"ext_lost",
+      "endpoint.packets.rtt":"ext_rtt"
+    }
+  tagmap:
+    {
+      "endpoint":"device_ip",
+      "ifname":"if_name"
+    }
+- name: snmp_5m
+  db: telegraf_ds
+  measurement: snmp_5m
+  backends: [server1, server2]
+  metricmap:
+    {
+      "switch.if.In.NEW.5m":"in_rate",
+      "switch.if.Out.NEW.5m":"out_rate",
+      "switch.if.InPkts.NEW.5m":"in_pkts_rate",
+      "switch.if.OutPkts.NEW.5m":"out_pkts_rate"
+    }
+  tagmap:
+    {
+      "endpoint":"device_ip",
+      "ifname":"if_name"
+    }
+- name: snmp_30m
+  db: telegraf_ds
+  measurement: snmp_30m
+  backends: [server1, server2]
+  metricmap:
+    {
+      "switch.if.In.NEW.30m":"in_rate",
+      "switch.if.Out.NEW.30m":"out_rate",
+      "switch.if.InPkts.NEW.30m":"in_pkts_rate",
+      "switch.if.OutPkts.NEW.30m":"out_pkts_rate"
+    }
+  tagmap:
+    {
+      "endpoint":"device_ip",
+      "ifname":"if_name"
+    }
+- name: icmp_vsi_5m
+  db: syscxp_ds
+  measurement: icmp_vsi_5m
+  backends: [server1, server2]
+  metricmap: 
+    {
+      "tunnel.packets.lost.NEW.5m":"vsi_lost",
+      "tunnel.packets.rtt.NEW.5m":"vsi_rtt"
+    }
+  tagmap:
+    {
+      "endpoint":"device_ip",
+      "ifname":"if_name"
+    }
+- name: icmp_vpn_5m
+  db: syscxp_ds
+  measurement: icmp_vpn_5m
+  backends: [server1, server2]
+  metricmap: 
+    {
+      "l3.packets.lost.NEW.5m":"vpn_lost",
+      "l3.packets.rtt.NEW.5m":"vpn_rtt"
+    }
+  tagmap:
+    {
+      "endpoint":"device_ip",
+      "ifname":"if_name"
+    }
+- name: icmp_ext_5m
+  db: syscxp_ds
+  measurement: icmp_ext_5m
+  backends: [server1, server2]
+  metricmap: 
+    {
+      "endpoint.packets.lost.NEW.5m":"ext_lost",
+      "endpoint.packets.rtt.NEW.5m":"ext_rtt"
+    }
+  tagmap:
+    {
+      "endpoint":"device_ip",
+      "ifname":"if_name"
     }
 # use by reverse proxy mode
 rservers:
