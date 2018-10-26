@@ -180,10 +180,16 @@ func (iq *InfluxQuery) createSQL() string {
 
 func (iq *InfluxQuery) QueryFromBackend(secondary bool) (results []client.Result) {
 	if iq.PrimaryURL == "" {
+		log.Println("PrimaryURL is nil")
 		return
 	}
 	url := iq.PrimaryURL
 	if secondary {
+		if iq.SecondaryURL == "" {
+			log.Println("SecondaryURL is nil")
+			return
+		}
+		log.Println("Query from secondary, url: ", iq.SecondaryURL)
 		url = iq.SecondaryURL
 	}
 	//log.Println(url)
@@ -192,18 +198,19 @@ func (iq *InfluxQuery) QueryFromBackend(secondary bool) (results []client.Result
 	})
 
 	if err != nil {
-		log.Println("Error creating InfluxDB Client: ", err.Error())
-	}
-	defer c.Close()
-	sql := iq.createSQL()
-	q := client.NewQuery(sql, iq.DB, "s")
-	response, err := c.Query(q)
-	if err == nil && response.Error() == nil {
-		results = response.Results
+		log.Println("Error creating InfluxDB Client: ", err.Error(), " URL: ", url)
 	} else {
-		log.Println(err)
-		if !secondary {
-			return iq.QueryFromBackend(true)
+		defer c.Close()
+		sql := iq.createSQL()
+		q := client.NewQuery(sql, iq.DB, "s")
+		response, err := c.Query(q)
+		if err == nil && response.Error() == nil {
+			results = response.Results
+		} else {
+			log.Println("Query error, URL: ", url)
+			if !secondary {
+				return iq.QueryFromBackend(true)
+			}
 		}
 	}
 	return
