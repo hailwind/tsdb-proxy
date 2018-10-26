@@ -4,11 +4,11 @@ import (
 	"errors"
 	"flag"
 	"log"
-	"time"
 	"math/rand"
-    "net/url"
-    "net/http"
+	"net/http"
 	"net/http/httputil"
+	"net/url"
+	"time"
 )
 
 var (
@@ -25,7 +25,7 @@ func init() {
 }
 
 func converter(conf *Conf) {
-	go Ping(&conf.Backends)
+	go HealthCheck(&conf.Backends)
 	var err error
 	mux := http.NewServeMux()
 	NewHttpService(conf).Register(mux)
@@ -45,10 +45,10 @@ func converter(conf *Conf) {
 
 func ReverseProxy(targets []url.URL) *httputil.ReverseProxy {
 	director := func(req *http.Request) {
-			target := targets[rand.Int()%len(targets)]
-			req.URL.Scheme = target.Scheme
-			req.URL.Host = target.Host
-			req.URL.Path = target.Path
+		target := targets[rand.Int()%len(targets)]
+		req.URL.Scheme = target.Scheme
+		req.URL.Host = target.Host
+		req.URL.Path = target.Path
 	}
 	return &httputil.ReverseProxy{Director: director}
 }
@@ -58,7 +58,7 @@ func reverse(conf *Conf) {
 	for _, rserver := range conf.RServers {
 		urls = append(urls, url.URL{
 			Scheme: rserver.Scheme,
-			Host: rserver.Host,
+			Host:   rserver.Host,
 		})
 	}
 	reverseProxy := ReverseProxy(urls)
@@ -74,7 +74,7 @@ func main() {
 	log.Printf("http service start at %s.", conf.ListenAddr)
 	if conf.Mode == "reverse" {
 		reverse(conf)
-	}else{
+	} else {
 		converter(conf)
 	}
 }

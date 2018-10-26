@@ -209,25 +209,29 @@ func (iq *InfluxQuery) QueryFromBackend(secondary bool) (results []client.Result
 	return
 }
 
-func Ping(backends *[]Backend) {
+func HealthCheck(backends *[]Backend) {
 	for {
-		for idx, backend := range *backends {
-			c, err := client.NewHTTPClient(client.HTTPConfig{
-				Addr: backend.URL,
-			})
-
-			if err != nil {
-				fmt.Println("Error creating InfluxDB Client: ", err.Error())
-			}
-			defer c.Close()
-			_, _, err = c.Ping(0)
-			if err != nil {
-				backend.Alive = false
-			} else {
-				backend.Alive = true
-			}
-			(*backends)[idx] = backend
-		}
+		ping(backends)
 		time.Sleep(time.Second * 2)
+	}
+}
+
+func ping(backends *[]Backend) {
+	for idx, backend := range *backends {
+		c, err := client.NewHTTPClient(client.HTTPConfig{
+			Addr: backend.URL,
+		})
+
+		if err != nil {
+			fmt.Println("Error creating InfluxDB Client: ", err.Error())
+		}
+		defer c.Close()
+		_, _, err = c.Ping(0)
+		if err != nil {
+			backend.Alive = false
+		} else {
+			backend.Alive = true
+		}
+		(*backends)[idx] = backend
 	}
 }
