@@ -17,9 +17,9 @@ type Backend struct {
 	Alive bool
 }
 type Server struct {
-	Scheme  string
+	Scheme string
 	Host   string
-	Alive bool
+	Alive  bool
 }
 type Mapping struct {
 	Name        string
